@@ -1,0 +1,66 @@
+Test #1
+Create new pet (POST /pet) with:
+Name: Rex
+Category: Dogs (id=10)
+Tags: Small dog (id=31), Cute (id=30), Silent (id=20)
+Photo urls: https://unsplash.com/photos/v3-zcCWMjgM, https://unsplash.com/photos/T-0EW-SEbsE, https://unsplash.com/photos/BJaqPaH6AGQ
+Status: available
+
+Check that status code 200
+Check that after creation pet id not equals 0
+All data in respons the same as in request
+
+Test #2
+Get pet by id. Use Id from previous test to get pet by id (GET /pet/{petId})
+
+Check that status code 200
+Check that pet name in response Rex, and status available
+
+Test #3
+Update pet Name and status (POST /pet/{petId}). In this test content type should be changed. Name and status should be passed as formParam()
+
+Update created pet (from 1 test)
+Set name: Sky
+Set status: sold
+
+Check that status code 200
+Check that value of message field in response equals to pet Id
+After update make (GET /pet/{petId}). Check that name and status were saved
+
+
+Test #4
+Delete created pet(DELETE /pet/{petId})
+
+Check that status code 200
+Check that value of message field in response equals to pet Id
+
+After update make (GET /pet/{petId}).
+Check that status code 404
+Check that body equals to:
+{
+  "code": 1,
+  "type": "error",
+  "message": "Pet not found"
+}
+
+
+Test #5
+Create new dog with random data (POST /pet) and status sold
+Find pet by status (GET /pet/findByStatus) sold
+Check that created dog exist in result body
+
+Test #6
+Create user (POST /user) with any random data
+Check that status code 200
+Check that message body not equals to 0
+
+Test #7
+Get user (GET /user/{username})
+Check that status code 200
+Check that all data from test #6 was saved
+Check that used id = value of massage field from previous test (#6)
+
+Test #8
+Login with created user (GET /user/login)
+Check that status code 200
+Check that message contains value is "message": "logged in user session:"
