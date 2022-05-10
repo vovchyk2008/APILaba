@@ -214,17 +214,19 @@ public class FirstTest extends BaseTest {
 
     SoftAssertions softAssertions = new SoftAssertions();
 
-    PetModel foundedPetModel = RestAssured
+    ValidatableResponse validatableResponse = RestAssured
         .given()
         .queryParam("status", "sold")
         .when()
         .get(PET_BY_STATUS)
         .then()
-        .extract().as(PetModel.class);
+        .statusCode(200);
 
-    Assertions.assertThat(foundedPetModel)
-        .as("")
-        .
+    PetModel model = validatableResponse.extract().as(PetModel.class);
+
+//    Assertions.assertThat(model)
+//        .as("")
+//        .con
   }
 
 
