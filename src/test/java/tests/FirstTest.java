@@ -3,11 +3,13 @@ package tests;
 
 import static сore.model.Endpoints.PET;
 import static сore.model.Endpoints.PET_BY_ID;
+import static сore.model.Endpoints.PET_BY_STATUS;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
 import java.util.ArrayList;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.testng.annotations.Test;
 import сore.model.DeletePetModel;
@@ -179,6 +181,57 @@ public class FirstTest extends BaseTest {
 
     softAssertions.assertAll();
   }
+
+  @Test
+  public void checkThatCreatedDogExistInResultBody() {
+    List<Tag> listTags = new ArrayList<>();
+    listTags.add(new Tag(12, "Angry"));
+    listTags.add(new Tag(14, "Big"));
+    listTags.add(new Tag(16, "Slow"));
+
+    List<String> listUrl = new ArrayList<>();
+    listUrl.add("https://unsplash.com/photos/v3-zcCWMjgM");
+    listUrl.add("https://unsplash.com/photos/T-0EW-SEbsE");
+    listUrl.add("https://unsplash.com/photos/BJaqPaH6AGQ");
+
+    PetModel petModel = PetModel.builder()
+        .name("Sharik")
+        .category(new Category(10, "Dogs"))
+        .tags(listTags)
+        .photoUrls(listUrl)
+        .status("sold")
+        .build();
+
+    ValidatableResponse petResponse = RestAssured
+        .given()
+        .body(petModel)
+        .when()
+        .post(PET)
+        .then()
+        .statusCode(200);
+
+    PetModel responsePetModel = petResponse.extract().as(PetModel.class);
+
+    petId = responsePetModel.getId();//get ID from created pet
+    SoftAssertions softAssertions = new SoftAssertions();
+
+    PetModel foundedPetModel = RestAssured
+        .given()
+        .queryParam("status", "sold")
+        .when()
+        .get(PET_BY_STATUS)
+        .then()
+        .extract().as(PetModel.class);
+
+    Assertions.assertThat(foundedPetModel)
+        .as("")
+        .(petModel);
+  }
+
+
+    //Create new dog with random data (POST /pet) and status sold
+  //Find pet by status (GET /pet/findByStatus) sold
+  //Check that created dog exist in result body
 
 
   }
