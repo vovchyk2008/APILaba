@@ -8,7 +8,7 @@ Status: available
 
 Check that status code 200
 Check that after creation pet id not equals 0
-All data in respons the same as in request
+All data in response the same as in request
 
 Test #2
 Get pet by id. Use Id from previous test to get pet by id (GET /pet/{petId})
