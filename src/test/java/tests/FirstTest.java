@@ -212,7 +212,6 @@ public class FirstTest extends BaseTest {
 
     PetModel responsePetModel = petResponse.extract().as(PetModel.class);
 
-    petId = responsePetModel.getId();//get ID from created pet
     SoftAssertions softAssertions = new SoftAssertions();
 
     PetModel foundedPetModel = RestAssured
@@ -225,7 +224,7 @@ public class FirstTest extends BaseTest {
 
     Assertions.assertThat(foundedPetModel)
         .as("")
-        .(petModel);
+        .
   }
 
 
