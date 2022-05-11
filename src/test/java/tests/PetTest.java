@@ -1,25 +1,27 @@
 package tests;
 
 
-import static сore.model.Endpoints.PET;
-import static сore.model.Endpoints.PET_BY_ID;
-import static сore.model.Endpoints.PET_BY_STATUS;
+import static сore.endpoints.Endpoints.PET;
+import static сore.endpoints.Endpoints.PET_BY_ID;
+import static сore.endpoints.Endpoints.PET_BY_STATUS;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.testng.annotations.Test;
-import сore.model.DeletePetModel;
-import сore.model.NotFoundModel;
-import сore.model.PetModel;
-import сore.model.PetModel.Category;
-import сore.model.PetModel.Tag;
-import сore.model.UpdatePetModel;
+import сore.models.pet.DeletePetModel;
+import сore.models.pet.FindByStatusPetModel;
+import сore.models.pet.NotFoundModel;
+import сore.models.pet.PetModel;
+import сore.models.pet.PetModel.Category;
+import сore.models.pet.PetModel.Tag;
+import сore.models.pet.UpdatePetModel;
 
-public class FirstTest extends BaseTest {
+public class PetTest extends BaseTest {
 
   static Long petId;
   static String petName = "Rex";
@@ -86,12 +88,12 @@ public class FirstTest extends BaseTest {
 
     //Check that pet name in response Rex
     softAssertions.assertThat(responsePetModel.getName())
-        .as("")
+        .as("We are waiting that pets name is: " + petName)
         .isEqualTo(petName);
 
     //Check that status available
     softAssertions.assertThat(responsePetModel.getStatus())
-        .as("")
+        .as("We are waiting that status is available" )
         .isEqualTo("available");
 
     softAssertions.assertAll();
@@ -100,18 +102,21 @@ public class FirstTest extends BaseTest {
   @Test(dependsOnMethods = "checkPetsDataRequest")
   public void checkThatUpdatePetNameAndStatusTest() {
 
-    ValidatableResponse petResponse = RestAssured
+    String newPetsName = "Sky";
+    String newStatus = "sold";
+
+    ValidatableResponse updatePetResponse = RestAssured
         .given()
         .contentType("application/x-www-form-urlencoded")
         .pathParam("id", petId)
-        .formParam("name", "Sky")
-        .formParam("status", "sold")
+        .formParam("name", newPetsName)
+        .formParam("status", newStatus)
         .when()
         .post(PET_BY_ID)
         .then()
         .statusCode(200);
 
-    UpdatePetModel updateResponse = petResponse.extract().as(UpdatePetModel.class);
+    UpdatePetModel updateResponse = updatePetResponse.extract().as(UpdatePetModel.class);
 
     SoftAssertions softAssertions = new SoftAssertions();
 
@@ -119,18 +124,20 @@ public class FirstTest extends BaseTest {
         .as("Expected that value of message field in response equals to pet Id")
         .isEqualTo(petId);
 
-    PetModel afterUpdatePetModal = RestAssured
+    ValidatableResponse petAfterUpdateResponse = RestAssured
         .given()
         .pathParam("id", petId)
         .when()
         .get(PET_BY_ID)
         .then()
-        .statusCode(200).extract().as(PetModel.class);
+        .statusCode(200);
 
-    softAssertions.assertThat(afterUpdatePetModal.getName())
+    PetModel actualUpdateModel = petAfterUpdateResponse.extract().as(PetModel.class);
+
+    softAssertions.assertThat(actualUpdateModel.getName())
         .as("Expected that new name of dog [Sky]")
         .isEqualTo("Sky");
-    softAssertions.assertThat(afterUpdatePetModal.getStatus())
+    softAssertions.assertThat(actualUpdateModel.getStatus())
         .as("Expected that new status [sold]")
         .isEqualTo("sold");
 
@@ -184,6 +191,11 @@ public class FirstTest extends BaseTest {
 
   @Test
   public void checkThatCreatedDogExistInResultBody() {
+
+    String petStatus = "sold";
+    String petName = "Sharik";
+    Category petCategory = new Category(15, "Dogs");
+
     List<Tag> listTags = new ArrayList<>();
     listTags.add(new Tag(12, "Angry"));
     listTags.add(new Tag(14, "Big"));
@@ -195,14 +207,15 @@ public class FirstTest extends BaseTest {
     listUrl.add("https://unsplash.com/photos/BJaqPaH6AGQ");
 
     PetModel petModel = PetModel.builder()
-        .name("Sharik")
-        .category(new Category(10, "Dogs"))
+        .name(petName)
+        .category(petCategory)
         .tags(listTags)
         .photoUrls(listUrl)
-        .status("sold")
+        .status(petStatus)
         .build();
+    //Create new dog with random data (POST /pet) and status sold
 
-    ValidatableResponse petResponse = RestAssured
+    ValidatableResponse creatingPetResponse = RestAssured
         .given()
         .body(petModel)
         .when()
@@ -210,29 +223,24 @@ public class FirstTest extends BaseTest {
         .then()
         .statusCode(200);
 
-    PetModel responsePetModel = petResponse.extract().as(PetModel.class);
+    //Find pet by status (GET /pet/findByStatus) sold
 
-    SoftAssertions softAssertions = new SoftAssertions();
-
-    ValidatableResponse validatableResponse = RestAssured
+    ValidatableResponse findPetResponse = RestAssured
         .given()
-        .queryParam("status", "sold")
+        .queryParam("status", petStatus)
         .when()
         .get(PET_BY_STATUS)
         .then()
         .statusCode(200);
 
-    PetModel model = validatableResponse.extract().as(PetModel.class);
+    List<FindByStatusPetModel> findByStatusPetModels = Arrays
+        .asList(findPetResponse.extract().as(FindByStatusPetModel[].class));
+    List<String> petsName = FindByStatusPetModel.getPetsName(findByStatusPetModels);
 
-//    Assertions.assertThat(model)
-//        .as("")
-//        .con
+    //Check that created dog exist in result body
+
+    Assertions.assertThat(petsName)
+        .as("We are waiting that: " + petName + "exists in result body")
+        .contains(petName);
   }
-
-
-    //Create new dog with random data (POST /pet) and status sold
-  //Find pet by status (GET /pet/findByStatus) sold
-  //Check that created dog exist in result body
-
-
   }

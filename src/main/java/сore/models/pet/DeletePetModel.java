@@ -1,4 +1,4 @@
-package сore.model;
+package сore.models.pet;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
