@@ -135,10 +135,10 @@ public class PetTest extends BaseTest {
     PetModel actualUpdateModel = petAfterUpdateResponse.extract().as(PetModel.class);
 
     softAssertions.assertThat(actualUpdateModel.getName())
-        .as("Expected that new name of dog [Sky]")
+        .as("Expected that new name of dog: " + newPetsName)
         .isEqualTo("Sky");
     softAssertions.assertThat(actualUpdateModel.getStatus())
-        .as("Expected that new status [sold]")
+        .as("Expected that new status: " + newStatus)
         .isEqualTo("sold");
 
     softAssertions.assertAll();
@@ -174,16 +174,17 @@ public class PetTest extends BaseTest {
 
     NotFoundModel notFoundModelResponse = petAfterDeleteResponse.extract().as(NotFoundModel.class);
 
+    //Check that value of message field in response equals to pet Id
     softAssertions.assertThat(notFoundModelResponse.getCode())
-        .as("Expected that body equals to [1]")
+        .as("We are waiting that code in body is [1]")
         .isEqualTo(1);
 
     softAssertions.assertThat(notFoundModelResponse.getType())
-        .as("Expected that body equals to [error]")
+        .as("We are waiting that type in body is [error]")
         .isEqualTo("error");
 
     softAssertions.assertThat(notFoundModelResponse.getMessage())
-        .as("Expected that body equals to [Pet not found]")
+        .as("We are waiting that message in body is [Pet not found]")
         .isEqualTo("Pet not found");
 
     softAssertions.assertAll();
