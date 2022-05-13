@@ -20,7 +20,7 @@ import lombok.ToString;
 @ToString
 public class FindByStatusPetModel {
 
-  public int id;
+  public Long id;
   public Category category;
   public String name;
   public List<String> photoUrls;
@@ -32,7 +32,7 @@ public class FindByStatusPetModel {
   @NoArgsConstructor
   public static class Category {
 
-    public int id;
+    public Integer id;
     public String name;
   }
 
@@ -42,7 +42,7 @@ public class FindByStatusPetModel {
   @NoArgsConstructor
   public static class Tag {
 
-    public int id;
+    public Integer id;
     public String name;
   }
 
