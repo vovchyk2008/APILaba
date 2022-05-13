@@ -21,4 +21,5 @@ public class DeletePetModel {
     private String type;
     private String message;
 
+
 }

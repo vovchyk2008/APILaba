@@ -21,6 +21,4 @@ public class UpdatePetModel {
   private String type;
   private String message;
 
-
-
 }
